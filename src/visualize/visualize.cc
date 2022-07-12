@@ -1,10 +1,11 @@
 /*
  * Copyright [2022] <Innovusion Inc.>
- * @LastEditTime: 2022-07-12 16:36:04
+ * @LastEditTime: 2022-07-12 17:27:11
  * @LastEditors: Tianyun Xuan
  */
 #include "visualize.h"
 
+#include <fstream>
 namespace visualization {
 
 void VisualCenter::pointPickingEventOccurred(
@@ -81,26 +82,10 @@ void VisualCenter::keyboardEventOccurred(
   }
 }
 
-void VisualCenter::update_source(const std::string& target,
-                                 const std::string& mode) {
-  m_folder_ = target;
-  m_mode_ = mode;
-  m_pcds_.clear();
-  for (auto& item : std::filesystem::directory_iterator(m_folder_)) {
-    std::filesystem::path temp = item;
-    if (temp.extension() == ".pcd") {
-      m_pcds_.emplace_back(temp);
-    }
-  }
-  std::sort(m_pcds_.begin(), m_pcds_.end());
-  std::cout << m_pcds_.size() << std::endl;
-}
-
 void VisualCenter::update_cloud() {
   m_viewer_->removeAllPointClouds();
   m_viewer_->removeText3D("dis");
-  // double curr = m_distance_ - m_index_ * 1.24;
-  double curr = m_distance_ - m_index_ * 1.86;
+  double curr = m_distance_ - m_index_ * m_deplacement_[m_index_];
   m_viewer_->addText3D(std::to_string(curr), m_txt_position_, 1, 255, 255, 255,
                        "dis");
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
@@ -152,18 +137,31 @@ void VisualCenter::play() {
   }
 }
 
-// boost::shared_ptr<pcl::visualization::PCLVisualizer> simpleVis(
-//     pcl::PointCloud<pcl::PointXYZI>::ConstPtr cloud) {
-//   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(
-//       new pcl::visualization::PCLVisualizer("3D Viewer"));
-//   viewer->setBackgroundColor(0, 0, 0);
-//   pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZI>
-//       fildColor(cloud, "intensity");
-//   viewer->addPointCloud<pcl::PointXYZI>(cloud, fildColor, "sample cloud");
-//   viewer->setPointCloudRenderingProperties(
-//       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
-//   viewer->addCoordinateSystem(1.0);
-//   viewer->initCameraParameters();
-//   return (viewer);
-// }
+void VisualCenter::parse_yaml(const std::string& yaml_addr) {
+  YAML::Node tf = YAML::LoadFile(yaml_addr);
+  for (YAML::const_iterator iter = tf.begin(); iter != tf.end(); ++iter) {
+    std::string param = iter->first.as<std::string>();
+    std::string value = iter->second.as<std::string>();
+    if (param == "pcd_folder") m_folder_ = value;
+    if (param == "point_type") m_mode_ = value;
+    if (param == "deplacement_txt") m_depz_ = value;
+  }
+  m_pcds_.clear();
+  for (auto& item : std::filesystem::directory_iterator(m_folder_)) {
+    std::filesystem::path temp = item;
+    if (temp.extension() == ".pcd") {
+      m_pcds_.emplace_back(temp);
+    }
+  }
+  std::sort(m_pcds_.begin(), m_pcds_.end());
+
+  m_deplacement_.clear();
+  std::ifstream infile(m_depz_);
+  std::string item;
+  while (getline(infile, item)) {
+    m_deplacement_.emplace_back(std::stod(item));
+  }
+
+  std::cout << m_pcds_.size() << "," << m_deplacement_.size() << std::endl;
+}
 }  // namespace visualization

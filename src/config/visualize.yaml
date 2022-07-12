@@ -1,0 +1,3 @@
+pcd_folder: "/home/xavier/repos/pcl_pcd_animator/speed-70/transformed"
+point_type: "XYZI"
+deplacement_txt: "/home/xavier/repos/pcl_pcd_animator/speed-70/deplacement.txt"

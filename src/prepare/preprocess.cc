@@ -5,7 +5,7 @@
  */
 
 #include "preprocess.h"
-
+#include <fstream>
 #include <pcl/common/transforms.h>
 using namespace std;
 using namespace std::filesystem;
@@ -27,6 +27,7 @@ bool PreOpreator::parse_yaml(const std::string& yaml_addr) {
     if (param == "xyzi_folder") m_xyzi_folder_ = value;
     if (param == "pose_folder") m_pose_folder_ = value;
     if (param == "transformed_folder") m_transformed_folder_ = value;
+    if (param == "deplacement_txt") m_deplace_txt_ = value;
   }
   return true;
 }
@@ -115,6 +116,7 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
     std::string source_cloud = from + "/iv_points_" + item + ".pcd";
     std::string save_cloud = to + "/iv_points_" + item + ".pcd";
     rtm(2, 3) += deplace / 10.f;
+    m_deplace_.emplace_back(deplace / 10.f);
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
         new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr output(
@@ -122,6 +124,10 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
     pcl::io::loadPCDFile<pcl::PointXYZI>(source_cloud, *cloud);
     pcl::transformPointCloud<pcl::PointXYZI>(*cloud, *output, rtm);
     pcl::io::savePCDFileBinary<pcl::PointXYZI>(save_cloud, *output);
+  }
+  ofstream f(m_deplace_txt_,ios::app);
+  for (auto& item : m_deplace_) {
+    f << item << std::endl;
   }
 }
 

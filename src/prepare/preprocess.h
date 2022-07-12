@@ -44,6 +44,8 @@ class PreOpreator {
   std::string m_xyzi_folder_;
   std::string m_pose_folder_;
   std::string m_transformed_folder_;
+  std::string m_deplace_txt_;
+  std::vector<double> m_deplace_;
 
  public:
   PreOpreator() : m_current_pose_(""), m_poses_({}) {}

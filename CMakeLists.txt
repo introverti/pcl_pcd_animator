@@ -32,7 +32,7 @@ aux_source_directory(./src/prepare DIR_PRE)
 aux_source_directory(./src/visualize DIR_VIS)
 
 add_executable(vis ${DIR_COM} ${DIR_VIS})
-target_link_libraries(vis Eigen3::Eigen ${OpenCV_LIBS} ${PCL_LIBRARIES} stdc++fs)
+target_link_libraries(vis Eigen3::Eigen ${OpenCV_LIBS} ${PCL_LIBRARIES} stdc++fs yaml-cpp)
 
 add_executable(pre ${DIR_COM} ${DIR_PRE})
 target_link_libraries(pre Eigen3::Eigen ${PCL_LIBRARIES} stdc++fs nlohmann_json::nlohmann_json yaml-cpp)

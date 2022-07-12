@@ -11,10 +11,14 @@
 
 #include "preprocess.h"
 
-
 int main(int argc, char** argv) {
   preprocess::PreOpreator dodo;
-  dodo.parse_yaml("/home/xavier/repos/pcl_pcd_animator/src/config/prepare_data.yaml");
+  if (argc > 1) {
+    dodo.parse_yaml(argv[1]);
+  } else {
+    dodo.parse_yaml(
+        "/home/xavier/repos/pcl_pcd_animator/src/config/prepare_data.yaml");
+  }
   dodo.Proc();
   return 1;
 }

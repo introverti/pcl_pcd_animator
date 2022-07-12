@@ -7,7 +7,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
-
+#include <yaml-cpp/yaml.h>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -23,6 +23,8 @@ class VisualCenter {
  private:
   std::string m_folder_;
   std::string m_mode_;
+  std::string m_depz_;
+  std::vector<double> m_deplacement_;
   std::vector<std::string> m_pcds_;
   int m_index_;
   ViewPtr m_viewer_;
@@ -33,6 +35,7 @@ class VisualCenter {
   VisualCenter() {
     m_pcds_ = {};
     m_mode_ = "";
+    m_depz_ ="";
     m_index_ = 0;
     m_distance_ = 458.4;
     m_txt_position_ = {5, 5, 5};
@@ -56,9 +59,9 @@ class VisualCenter {
                              void* viewer_void);
   void keyboardEventOccurred(const pcl::visualization::KeyboardEvent& event);
   void update_cloud();
-  void update_source(const std::string& target, const std::string& mode);
   void spin();
   void play();
+  void parse_yaml(const std::string& yaml_addr);
 };
 
 }  // namespace visualization
