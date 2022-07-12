@@ -1,6 +1,6 @@
-/*** 
+/***
  * @Copyright [2022] <Innovusion Inc.>
- * @LastEditTime: 2022-07-12 13:48:13
+ * @LastEditTime: 2022-07-12 15:08:18
  * @LastEditors: Tianyun Xuan
  */
 #include <pcl/io/pcd_io.h>
@@ -26,18 +26,26 @@ class VisualCenter {
   std::vector<std::string> m_pcds_;
   int m_index_;
   ViewPtr m_viewer_;
+  double m_distance_;
+  pcl::PointXYZ m_txt_position_;
 
  public:
   VisualCenter() {
     m_pcds_ = {};
     m_mode_ = "";
     m_index_ = 0;
+    m_distance_ = 458.4;
+    m_txt_position_ = {5, 5, 5};
     m_viewer_ =
         std::make_shared<pcl::visualization::PCLVisualizer>("3D Viewer");
     m_viewer_->setBackgroundColor(0, 0, 0);
-    m_viewer_->addCoordinateSystem(1.0);
+    // m_viewer_->addCoordinateSystem(1.0);
     m_viewer_->initCameraParameters();
-    m_viewer_->setCameraPosition(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+    m_viewer_->setCameraPosition(1.31497, -0.394183, -13.3555, 0.995829,
+                                 -0.000587688, 0.0912344, 1.0, 0.0, 0.0);
+    m_viewer_->addText3D(std::to_string(m_distance_), m_txt_position_, 1, 255,
+                         255, 255, "dis");
+    // m_viewer_->setCameraPosition(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
   }
   ~VisualCenter() = default;
   void pointPickingEventOccurred(
@@ -50,6 +58,7 @@ class VisualCenter {
   void update_cloud();
   void update_source(const std::string& target, const std::string& mode);
   void spin();
+  void play();
 };
 
 }  // namespace visualization

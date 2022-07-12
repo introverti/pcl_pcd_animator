@@ -39,6 +39,7 @@ class PreOpreator {
  private:
   std::string m_current_pose_;
   std::vector<std::pair<int, Eigen::Matrix4d>> m_poses_;
+  std::vector<std::pair<int, double>> m_speed_;
   std::string m_source_folder_;
   std::string m_xyzi_folder_;
   std::string m_pose_folder_;
@@ -51,7 +52,9 @@ class PreOpreator {
   void to_format_xyzi(const std::string& target,
                       const std::string& destination);
   void update_pose(const std::string& target);
+  void update_speed(const std::string& target);
   void find_nearest(const int& ns, Eigen::Matrix4d& rtm);
+  void find_nearest(const int& ns, double& dep_z);
   void match(const std::string& from, const std::string& to);
 
   void Proc();

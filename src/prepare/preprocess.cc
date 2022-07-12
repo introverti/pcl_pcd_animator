@@ -81,20 +81,40 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
     }
   }
   std::sort(source.begin(), source.end());
+  // for (auto& item : source) {
+  //   auto point = item.find('.');
+  //   std::string second = item.substr(0, point);
+  //   std::string nano = item.substr(point + 1, item.size());
+  //   int prec = std::stoi(nano);
+  //   // std::cout << "Need to load pose : " << second << std::endl;
+  //   update_pose(second);
+  //   Eigen::Matrix4d rtm;
+  //   // std::cout << "Target : " << prec << std::endl;
+  //   find_nearest(prec, rtm);
+  //   std::string source_cloud = from + "/iv_points_" + item + ".pcd";
+  //   std::string save_cloud = to + "/iv_points_" + item + ".pcd";
 
+  //   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
+  //       new pcl::PointCloud<pcl::PointXYZI>);
+  //   pcl::PointCloud<pcl::PointXYZI>::Ptr output(
+  //       new pcl::PointCloud<pcl::PointXYZI>);
+  //   pcl::io::loadPCDFile<pcl::PointXYZI>(source_cloud, *cloud);
+  //   pcl::transformPointCloud<pcl::PointXYZI>(*cloud, *output, rtm);
+  //   pcl::io::savePCDFileBinary<pcl::PointXYZI>(save_cloud, *output);
+  // }
+  Eigen::Matrix4d rtm = Eigen::Matrix4d::Identity();
+  rtm(2, 3) = -450.0;
   for (auto& item : source) {
     auto point = item.find('.');
     std::string second = item.substr(0, point);
     std::string nano = item.substr(point + 1, item.size());
     int prec = std::stoi(nano);
-    // std::cout << "Need to load pose : " << second << std::endl;
-    update_pose(second);
-    Eigen::Matrix4d rtm;
-    // std::cout << "Target : " << prec << std::endl;
-    find_nearest(prec, rtm);
+    update_speed(second);
+    double deplace;
+    find_nearest(prec, deplace);
     std::string source_cloud = from + "/iv_points_" + item + ".pcd";
     std::string save_cloud = to + "/iv_points_" + item + ".pcd";
-
+    rtm(2, 3) += deplace / 10.f;
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
         new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr output(
@@ -118,6 +138,19 @@ void PreOpreator::find_nearest(const int& ns, Eigen::Matrix4d& rtm) {
   //   std::cout << pair.first << std::endl;
   // }
   rtm = poses[0].second;
+}
+
+void PreOpreator::find_nearest(const int& ns, double& dep_z) {
+  std::vector<std::pair<int, double>> speed = m_speed_;
+  for (auto& pair : speed) {
+    pair.first = std::abs(pair.first - ns);
+  }
+  std::sort(speed.begin(), speed.end(),
+            [](std::pair<int, double>& a, std::pair<int, double>& b) {
+              return a.first < b.first;
+            });
+
+  dep_z = speed[0].second;
 }
 
 void PreOpreator::update_pose(const std::string& target) {
@@ -149,6 +182,30 @@ void PreOpreator::update_pose(const std::string& target) {
       rtm.block(0, 3, 3, 1) = trans;
 
       m_poses_.emplace_back(std::make_pair(prec, rtm));
+    }
+  }
+}
+
+void PreOpreator::update_speed(const std::string& target) {
+  if (target != m_current_pose_) {
+    m_current_pose_ = target;
+    m_speed_.clear();
+    std::string pose_file =
+        m_pose_folder_ + "/current_pose_" + m_current_pose_ + ".pose";
+    std::ifstream i(pose_file);
+    json j;
+    i >> j;
+    for (auto& item : j) {
+      std::string ts = item.at("timestamp");
+      auto point = ts.find('.');
+      // std::string second = ts.substr(0, point);
+      // std::cout << "Load pose: " << second << std::endl;
+      std::string nano = ts.substr(point + 1, ts.size());
+      int prec = std::stoi(nano);
+
+      std::vector<double> speed = item.at("speed");
+
+      m_speed_.emplace_back(std::make_pair(prec, speed[1]));
     }
   }
 }

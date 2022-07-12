@@ -1,6 +1,6 @@
 /*
  * Copyright [2022] <Innovusion Inc.>
- * @LastEditTime: 2022-07-12 13:55:47
+ * @LastEditTime: 2022-07-12 16:36:04
  * @LastEditors: Tianyun Xuan
  */
 #include "visualize.h"
@@ -62,18 +62,22 @@ void VisualCenter::keyboardEventOccurred(
     if (m_index_ == 0) {
       std::cout << "Already the first frame" << std::endl;
     } else {
-      std::cout << "Prev" << std::endl;
       --m_index_;
+      std::cout << "Prev frame : " << m_index_ << "/" << m_pcds_.size() - 1
+                << std::endl;
       update_cloud();
     }
   } else if (event.getKeySym() == "d" && event.keyDown()) {
     if ((size_t)m_index_ == m_pcds_.size() - 1) {
       std::cout << "Already the last frame" << std::endl;
     } else {
-      std::cout << "Next" << std::endl;
       ++m_index_;
+      std::cout << "Next frame : " << m_index_ << "/" << m_pcds_.size() - 1
+                << std::endl;
       update_cloud();
     }
+  } else if (event.getKeySym() == "y" && event.keyDown()) {
+    play();
   }
 }
 
@@ -94,6 +98,11 @@ void VisualCenter::update_source(const std::string& target,
 
 void VisualCenter::update_cloud() {
   m_viewer_->removeAllPointClouds();
+  m_viewer_->removeText3D("dis");
+  // double curr = m_distance_ - m_index_ * 1.24;
+  double curr = m_distance_ - m_index_ * 1.86;
+  m_viewer_->addText3D(std::to_string(curr), m_txt_position_, 1, 255, 255, 255,
+                       "dis");
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
       new pcl::PointCloud<pcl::PointXYZI>);
   if (m_mode_ == "XYZTI") {
@@ -131,6 +140,16 @@ void VisualCenter::spin() {
         this->keyboardEventOccurred(e);
       });
   m_viewer_->spin();
+}
+
+void VisualCenter::play() {
+  m_index_ = m_pcds_.size() - 1;
+  while (m_index_) {
+    update_cloud();
+    m_viewer_->spinOnce(200);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(90));
+    --m_index_;
+  }
 }
 
 // boost::shared_ptr<pcl::visualization::PCLVisualizer> simpleVis(
