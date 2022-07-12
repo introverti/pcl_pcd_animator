@@ -1,0 +1,5 @@
+function: "all"
+source_folder: "/home/xavier/repos/pcl_pcd_animator/speed-50/pcd"
+xyzi_folder: "/home/xavier/repos/pcl_pcd_animator/speed-50/XYZI"
+pose_folder: "/home/xavier/repos/pcl_pcd_animator/speed-50/pose"
+transformed_folder: "/home/xavier/repos/pcl_pcd_animator/speed-50/transformed"

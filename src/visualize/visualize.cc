@@ -1,3 +1,8 @@
+/*
+ * Copyright [2022] <Innovusion Inc.>
+ * @LastEditTime: 2022-07-12 13:55:47
+ * @LastEditors: Tianyun Xuan
+ */
 #include "visualize.h"
 
 namespace visualization {
@@ -34,16 +39,18 @@ void VisualCenter::keyboardEventOccurred(
     if (m_index_ == 0) {
       std::cout << "Already the first frame" << std::endl;
     } else {
-      std::cout << "Prev" << std::endl;
       --m_index_;
+      std::cout << "Prev frame : " << m_index_ << "/" << m_pcds_.size() - 1
+                << std::endl;
       update_cloud();
     }
   } else if (event.getKeySym() == "d" && event.keyDown()) {
     if ((size_t)m_index_ == m_pcds_.size() - 1) {
       std::cout << "Already the last frame" << std::endl;
     } else {
-      std::cout << "Next" << std::endl;
       ++m_index_;
+      std::cout << "Next frame : " << m_index_ << "/" << m_pcds_.size() - 1
+                << std::endl;
       update_cloud();
     }
   }
@@ -70,8 +77,10 @@ void VisualCenter::keyboardEventOccurred(
   }
 }
 
-void VisualCenter::update_source(std::string target) {
+void VisualCenter::update_source(const std::string& target,
+                                 const std::string& mode) {
   m_folder_ = target;
+  m_mode_ = mode;
   m_pcds_.clear();
   for (auto& item : std::filesystem::directory_iterator(m_folder_)) {
     std::filesystem::path temp = item;
@@ -85,23 +94,30 @@ void VisualCenter::update_source(std::string target) {
 
 void VisualCenter::update_cloud() {
   m_viewer_->removeAllPointClouds();
-  pcl::PointCloud<PointXYZTI>::Ptr source(new pcl::PointCloud<PointXYZTI>);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
       new pcl::PointCloud<pcl::PointXYZI>);
-  if (m_pcds_.size() && m_index_ >= 0 && (size_t)m_index_ < m_pcds_.size()) {
-    pcl::io::loadPCDFile<PointXYZTI>(m_pcds_[m_index_], *source);
-    cloud->clear();
-    for (auto point : source->points) {
-      pcl::PointXYZI temp({point.x, point.y, point.z});
-      temp.intensity = 256.f - float(point.intensity);
-      cloud->emplace_back(temp);
+  if (m_mode_ == "XYZTI") {
+    pcl::PointCloud<PointXYZTI>::Ptr source(new pcl::PointCloud<PointXYZTI>);
+    if (m_pcds_.size() && m_index_ >= 0 && (size_t)m_index_ < m_pcds_.size()) {
+      pcl::io::loadPCDFile<PointXYZTI>(m_pcds_[m_index_], *source);
+      cloud->clear();
+      for (auto point : source->points) {
+        pcl::PointXYZI temp({point.x, point.y, point.z});
+        temp.intensity = 256.f - float(point.intensity);
+        cloud->emplace_back(temp);
+      }
     }
-    pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZI>
-        fildColor(cloud, "intensity");
-    m_viewer_->addPointCloud<pcl::PointXYZI>(cloud, fildColor, "current");
-    m_viewer_->setPointCloudRenderingProperties(
-        pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "current");
+  } else {
+    pcl::io::loadPCDFile<pcl::PointXYZI>(m_pcds_[m_index_], *cloud);
+    for (auto& point : cloud->points) {
+      point.intensity = 256.f - point.intensity;
+    }
   }
+  pcl::visualization::PointCloudColorHandlerGenericField<pcl::PointXYZI>
+      fildColor(cloud, "intensity");
+  m_viewer_->addPointCloud<pcl::PointXYZI>(cloud, fildColor, "current");
+  m_viewer_->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "current");
 }
 
 void VisualCenter::spin() {

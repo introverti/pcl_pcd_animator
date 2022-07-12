@@ -1,15 +1,19 @@
+/*** 
+ * @Copyright [2022] <Innovusion Inc.>
+ * @LastEditTime: 2022-07-12 13:48:13
+ * @LastEditors: Tianyun Xuan
+ */
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
-#include <point_type.h>
 
 #include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "point_type.h"
+#include "../common/point_type.h"
 
 namespace visualization {
 
@@ -18,6 +22,7 @@ class VisualCenter {
 
  private:
   std::string m_folder_;
+  std::string m_mode_;
   std::vector<std::string> m_pcds_;
   int m_index_;
   ViewPtr m_viewer_;
@@ -25,6 +30,7 @@ class VisualCenter {
  public:
   VisualCenter() {
     m_pcds_ = {};
+    m_mode_ = "";
     m_index_ = 0;
     m_viewer_ =
         std::make_shared<pcl::visualization::PCLVisualizer>("3D Viewer");
@@ -42,7 +48,7 @@ class VisualCenter {
                              void* viewer_void);
   void keyboardEventOccurred(const pcl::visualization::KeyboardEvent& event);
   void update_cloud();
-  void update_source(std::string target);
+  void update_source(const std::string& target, const std::string& mode);
   void spin();
 };
 

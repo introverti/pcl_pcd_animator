@@ -1,3 +1,8 @@
+/*** 
+ * @Copyright [2022] <Innovusion Inc.>
+ * @LastEditTime: 2022-07-12 09:28:31
+ * @LastEditors: Tianyun Xuan
+ */
 #ifndef POINT_TYPE_H_
 #define POINT_TYPE_H_
 
