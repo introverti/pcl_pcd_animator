@@ -5,8 +5,10 @@
  */
 
 #include "preprocess.h"
-#include <fstream>
+
 #include <pcl/common/transforms.h>
+
+#include <fstream>
 using namespace std;
 using namespace std::filesystem;
 using json = nlohmann::json;
@@ -105,6 +107,7 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
   // }
   Eigen::Matrix4d rtm = Eigen::Matrix4d::Identity();
   rtm(2, 3) = -450.0;
+  double sum = 0.0;
   for (auto& item : source) {
     auto point = item.find('.');
     std::string second = item.substr(0, point);
@@ -116,7 +119,8 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
     std::string source_cloud = from + "/iv_points_" + item + ".pcd";
     std::string save_cloud = to + "/iv_points_" + item + ".pcd";
     rtm(2, 3) += deplace / 10.f;
-    m_deplace_.emplace_back(deplace / 10.f);
+    sum += deplace / 10.f;
+    m_deplace_.emplace_back(sum);
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
         new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr output(
@@ -125,7 +129,7 @@ void PreOpreator::match(const std::string& from, const std::string& to) {
     pcl::transformPointCloud<pcl::PointXYZI>(*cloud, *output, rtm);
     pcl::io::savePCDFileBinary<pcl::PointXYZI>(save_cloud, *output);
   }
-  ofstream f(m_deplace_txt_,ios::app);
+  ofstream f(m_deplace_txt_, ios::app);
   for (auto& item : m_deplace_) {
     f << item << std::endl;
   }

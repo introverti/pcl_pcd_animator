@@ -37,7 +37,7 @@ class VisualCenter {
     m_mode_ = "";
     m_depz_ ="";
     m_index_ = 0;
-    m_distance_ = 458.4;
+    m_distance_ = 0.0;
     m_txt_position_ = {5, 5, 5};
     m_viewer_ =
         std::make_shared<pcl::visualization::PCLVisualizer>("3D Viewer");

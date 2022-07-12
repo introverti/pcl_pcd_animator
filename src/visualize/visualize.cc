@@ -1,6 +1,6 @@
 /*
  * Copyright [2022] <Innovusion Inc.>
- * @LastEditTime: 2022-07-12 17:27:11
+ * @LastEditTime: 2022-07-12 17:47:18
  * @LastEditors: Tianyun Xuan
  */
 #include "visualize.h"
@@ -85,7 +85,7 @@ void VisualCenter::keyboardEventOccurred(
 void VisualCenter::update_cloud() {
   m_viewer_->removeAllPointClouds();
   m_viewer_->removeText3D("dis");
-  double curr = m_distance_ - m_index_ * m_deplacement_[m_index_];
+  double curr = m_distance_ - m_deplacement_[m_index_];
   m_viewer_->addText3D(std::to_string(curr), m_txt_position_, 1, 255, 255, 255,
                        "dis");
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
@@ -145,6 +145,10 @@ void VisualCenter::parse_yaml(const std::string& yaml_addr) {
     if (param == "pcd_folder") m_folder_ = value;
     if (param == "point_type") m_mode_ = value;
     if (param == "deplacement_txt") m_depz_ = value;
+    if (param == "origin_distance") {
+      double dvalue = iter->second.as<double>();
+      m_distance_ = dvalue;
+    }
   }
   m_pcds_.clear();
   for (auto& item : std::filesystem::directory_iterator(m_folder_)) {
