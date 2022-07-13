@@ -33,25 +33,20 @@ ldd -r ${PROJECT_RELEASE_DIR}/bin/vis | awk '{print $3}' | xargs -i cp -n {} ${P
 ldd -r ${PROJECT_RELEASE_DIR}/bin/pre | awk '{print $3}' | xargs -i cp -n {} ${PROJECT_RELEASE_DIR}/lib/
 trace "Copyed necessary libraries"
 
+trace "Add rpath $ORIGIN of ${APOLLO_ROOT_DIR}/lib/*"
 for file in ${PROJECT_RELEASE_DIR}/lib/*; do
     if test -f $file; then
-        trace "yes"
         rpath=$(patchelf --print-rpath $file)
-        trace ${rpath}
         patchelf --set-rpath '$ORIGIN':${rpath} $file
         rpath=$(patchelf --print-rpath $file)
-        trace ${rpath}
     fi
 done
 
-trace "add rpath $ORIGIN of ${APOLLO_ROOT_DIR}/output/bin/*"
+trace "Add rpath $ORIGIN of ${APOLLO_ROOT_DIR}/output/bin/*"
 for file in ${PROJECT_RELEASE_DIR}/bin/*; do
     if test -f $file; then
-        trace "yes"
         rpath=$(patchelf --print-rpath $file)
-        trace ${rpath}
         patchelf --set-rpath '$ORIGIN/../lib':${rpath} $file
         rpath=$(patchelf --print-rpath $file)
-        trace ${rpath}
     fi
 done
