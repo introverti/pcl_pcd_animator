@@ -16,8 +16,7 @@ int main(int argc, char** argv) {
   if (argc > 1) {
     dodo.parse_yaml(argv[1]);
   } else {
-    dodo.parse_yaml(
-        "/home/xavier/repos/pcl_pcd_animator/src/config/prepare_data.yaml");
+    dodo.parse_yaml("/home/xavier/repos/pcl_pcd_animator/config/prepare_data.yaml");
   }
   dodo.Proc();
   return 1;

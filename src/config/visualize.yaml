@@ -1,5 +1,0 @@
-pcd_folder: "/home/xavier/repos/pcl_pcd_animator/speed-50/pcd"
-point_type: "XYZTI"
-deplacement_txt: "/home/xavier/repos/pcl_pcd_animator/speed-50/deplacement.txt"
-origin_distance: 475.0 # 50km/h
-# origin_distance: 388.0  # 70km/h

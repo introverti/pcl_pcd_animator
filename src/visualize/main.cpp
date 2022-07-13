@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
   if (argc > 1) {
     opera.parse_yaml(argv[1]);
   } else {
-    opera.parse_yaml("/home/xavier/repos/pcl_pcd_animator/src/config/visualize.yaml");
+    opera.parse_yaml("/home/xavier/repos/pcl_pcd_animator/config/visualize.yaml");
   }
   opera.spin();
   return 1;
